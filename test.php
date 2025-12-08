@@ -5,15 +5,15 @@
     
 /*
     Options for get all projetcs
- 
+*/
     $defaults = array(
-        CURLOPT_URL => $url . '/project',
+        CURLOPT_URL => $url . '/animal',
         // CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
         // CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
         CURLOPT_CUSTOMREQUEST => "GET"
 
     );
-*/
+
 
 /**
  * Options for get all tasks
@@ -37,13 +37,12 @@
     // );
     
 /**
- * Options for insert new task
+ * Options for insert new animal
  */
-     $params = json_encode(array("projectId" => '72f7cc6e-3717-11eb-add7-2c4d544f8fe0'
-         , 'title' => 'Neuer Task 5'
-         , 'expense' => '0,25'
-         , 'dueDate' => '15.03.2022'
-         , 'priorityId' => 1));
+/*
+     $params = json_encode(array("animalid" => '5'
+         , 'trivialname' => 'Maya'
+         , 'sciencename' => 'Fungina'
      $defaults = array(
          CURLOPT_URL => $url . '/task',
          CURLOPT_CUSTOMREQUEST => "POST",
@@ -51,7 +50,7 @@
          CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
          CURLOPT_POSTFIELDS => $params
      );
-
+*/
 /**
  * Options for Update Task OHNE Login
  */
