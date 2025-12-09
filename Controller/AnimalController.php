@@ -18,13 +18,13 @@ class AnimalController {
     }
 
     public function writeAnimal($data)
-{
+    {
     $model = new AnimalModel();
     $model->insertAnimal($data);
 
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(["success" => true, "msg" => "Animal wurde gespeichert"]);
-}
+    echo json_encode(["success" => true, "msg" => "Animal was posted"]);
+    }
 
    
 }

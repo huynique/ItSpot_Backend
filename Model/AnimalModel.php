@@ -12,6 +12,9 @@ class AnimalModel extends Database
         //link
 
     }
+
+
+
     public function selectAnimal(): array
     { try {
         
@@ -28,7 +31,7 @@ class AnimalModel extends Database
 
 
 
-    
+
     
     public function insertAnimal(array $data): void
     {
@@ -44,16 +47,21 @@ class AnimalModel extends Database
         $uuid = $this->createUUID();
 
         $stmt->execute([
-            ':animalid' => 6,
+            ':animalid' => $data['animalid'],
             ':trivialname' => $data['trivialname'],
             ':sciencename' => $data['sciencename'],
-            ':lastseen' => $data['lastseen'],
+            ':lastseen' => \DateTime::createFromFormat('d.m.Y', $data['lastseen']),
             ':sightingscount' => $data['sightingscount'],
             ':animalcount' => $data['animalcount'],
         ]);
 
+        
+
     } catch (\PDOException $e) {
         new \ppb\Library\Msg(true, "Fehler beim Speichern", $e);
     }
-}
+    }
+
+
+
 }
