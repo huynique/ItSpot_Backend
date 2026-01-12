@@ -11,8 +11,8 @@ abstract class Database {
      */
     private $dbName = "itspot"; //Datenbankname
     private $linkName = "localhost"; //Datenbank-Server
-    private $user = "root"; //Benutzername  pbg2h24afu
-    private $pw = "root"; //Passwort   Qz6pWRsXejgD
+    private $user = "root"; //Benutzername pbg2h24afu
+    private $pw = "root"; //Passwort Qz6pWRsXejgD
     
     /**
      * Stellt eine Verbindung zur Datenbank her

@@ -10,16 +10,13 @@ class AnimalModel extends Database
     public function __construct()
     {
         //link
-
     }
-
-
 
     public function selectAnimal(): array
     { try {
         
         $linkDB = $this->linkDB();   
-
+        
         $stmt = $linkDB->query("SELECT animalid, trivialname, sciencename, lastseen, sightingscount, animalcount FROM animals");
 
         return $stmt ->fetchAll(\PDO::FETCH_ASSOC);
@@ -29,10 +26,6 @@ class AnimalModel extends Database
     }
     }
 
-
-
-
-    
     public function insertAnimal(array $data): void
     {
     try {
@@ -53,15 +46,11 @@ class AnimalModel extends Database
             ':lastseen' => \DateTime::createFromFormat('d.m.Y', $data['lastseen']),
             ':sightingscount' => $data['sightingscount'],
             ':animalcount' => $data['animalcount'],
-        ]);
-
-        
+        ]); 
 
     } catch (\PDOException $e) {
         new \ppb\Library\Msg(true, "Fehler beim Speichern", $e);
     }
     }
-
-
 
 }

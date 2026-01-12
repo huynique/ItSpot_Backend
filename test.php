@@ -6,6 +6,7 @@
 /*
     Options for get all projetcs
 */
+/*
     $defaults = array(
         CURLOPT_URL => $url . '/animal',
         // CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
@@ -13,7 +14,7 @@
         CURLOPT_CUSTOMREQUEST => "GET"
 
     );
-
+*/
 
 /**
  * Options for get all tasks
@@ -39,18 +40,21 @@
 /**
  * Options for insert new animal
  */
-/*
-     $params = json_encode(array("animalid" => '5'
-         , 'trivialname' => 'Maya'
-         , 'sciencename' => 'Fungina'
+
+     $params = json_encode(array("animalid" => '6767'
+         , 'trivialname' => 'Huy'
+         , 'sciencename' => 'Kong'
+         , 'lastseen' => '13/04/2004'
+         , 'sightingscount' => '67'
+         , 'animalcount' => '67'));
      $defaults = array(
-         CURLOPT_URL => $url . '/task',
+         CURLOPT_URL => $url . '/animal',
          CURLOPT_CUSTOMREQUEST => "POST",
          CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
          CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
          CURLOPT_POSTFIELDS => $params
      );
-*/
+
 /**
  * Options for Update Task OHNE Login
  */
