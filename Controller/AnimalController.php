@@ -17,6 +17,16 @@ class AnimalController {
         echo json_encode($model->selectAnimal(),JSON_PRETTY_PRINT) ; 
     }
 
+    public function getFilteredAnimal(): void
+    {
+        $model = new AnimalModel() ;
+        $filter = [];
+        if(isset($_GET['minAnimalCount'])) {
+            $filter['minAnimalCount'] = (int)$_GET['minAnimalCount'];
+        }
+        echo json_encode($model->selectAnimal($filter),JSON_PRETTY_PRINT) ; 
+    }
+
     public function writeAnimal($data)
     {
     $model = new AnimalModel();

@@ -30,23 +30,25 @@
 /**
  * Options for get tasks filtered
  */
-    // $defaults = array(
-    //     CURLOPT_URL => $url . '/task/getFilteredTasks?dueDate=1%20DAY',
-    //     CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
-    //     CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
-    //     CURLOPT_CUSTOMREQUEST => "GET"
-    // );
+
+     $defaults = array(
+         CURLOPT_URL => $url . '/animal/getFilteredAnimal?minAnimalCount=3&minSightingsCount=15',
+         CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
+         CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
+         CURLOPT_CUSTOMREQUEST => "GET"
+    );
+    
     
 /**
  * Options for insert new animal
  */
-
-     $params = json_encode(array("animalid" => '6767'
-         , 'trivialname' => 'Huy'
-         , 'sciencename' => 'Kong'
-         , 'lastseen' => '13/04/2004'
-         , 'sightingscount' => '67'
-         , 'animalcount' => '67'));
+/*
+     $params = json_encode(array("animalid" => '187'
+         , 'trivialname' => 'Oxolotl'
+         , 'sciencename' => 'Pinecest'
+         , 'lastseen' => '13.04.2004'
+         , 'sightingscount' => '90'
+         , 'animalcount' => '90'));
      $defaults = array(
          CURLOPT_URL => $url . '/animal',
          CURLOPT_CUSTOMREQUEST => "POST",
@@ -54,6 +56,7 @@
          CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
          CURLOPT_POSTFIELDS => $params
      );
+     */
 
 /**
  * Options for Update Task OHNE Login

@@ -9,10 +9,10 @@ abstract class Database {
     /**
      * Zugangsdaten für die Datenbank 
      */
-    private $dbName = "itspot"; //Datenbankname
-    private $linkName = "localhost"; //Datenbank-Server
-    private $user = "root"; //Benutzername pbg2h24afu
-    private $pw = "root"; //Passwort Qz6pWRsXejgD
+    private $dbName = "pbg2h24afu_vpr"; //Datenbankname
+    private $linkName = "mysql.pb.bib.de"; //Datenbank-Server
+    private $user = "pbg2h24afu"; //Benutzername pbg2h24afu
+    private $pw = "Qz6pWRsXejgD"; //Passwort Qz6pWRsXejgD
     
     /**
      * Stellt eine Verbindung zur Datenbank her

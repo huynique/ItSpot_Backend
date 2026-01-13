@@ -12,19 +12,43 @@ class AnimalModel extends Database
         //link
     }
 
-    public function selectAnimal(): array
-    { try {
-        
-        $linkDB = $this->linkDB();   
-        
-        $stmt = $linkDB->query("SELECT animalid, trivialname, sciencename, lastseen, sightingscount, animalcount FROM animals");
+    
+public function selectAnimal(array $filter = []): array
+{
+    try {
+        $pdo = $this->linkDB();
 
-        return $stmt ->fetchAll(\PDO::FETCH_ASSOC);
-    } catch (\PDOException $e) 
-    {
-        new \ppb\Library\Msg(true, "Ein Fehler" , $e);
+        $query = "SELECT animalid, trivialname, sciencename, lastseen, sightingscount, animalcount FROM animals";
+
+        $where = [];
+        $params = [];
+
+        /*
+        if (isset($filter['minAnimalCount'])) {
+            $where[] = "animalcount >= :minAnimalCount"; 
+            $params[':minAnimalCount'] = (int)$filter['minAnimalCount'];
+        }
+            */
+        if (isset($filter['minSightingsCount'])) {
+            $where[] = "sightingscount >= :minSightingsCount"; 
+            $params[':minSightingsCount'] = (int)$filter['minSightingsCount'];
+        }
+
+        if (!empty($where)) {
+            $query .= " WHERE " . implode(" AND ", $where);
+        }
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params); // Parameter übergeben!
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    } catch (\PDOException $e) {
+        new \ppb\Library\Msg(true, "Ein Fehler", $e);
+        return [];
     }
-    }
+}
+
 
     public function insertAnimal(array $data): void
     {
@@ -38,12 +62,13 @@ class AnimalModel extends Database
 
         // UUID erzeugen (du hast ja createUUID() in Database)
         $uuid = $this->createUUID();
+        $dt = \DateTime::createFromFormat('d.m.Y', $data['lastseen']);
 
         $stmt->execute([
             ':animalid' => $data['animalid'],
             ':trivialname' => $data['trivialname'],
             ':sciencename' => $data['sciencename'],
-            ':lastseen' => \DateTime::createFromFormat('d.m.Y', $data['lastseen']),
+            ':lastseen' => $dt ? $dt->format('Y-m-d') : null,
             ':sightingscount' => $data['sightingscount'],
             ':animalcount' => $data['animalcount'],
         ]); 
