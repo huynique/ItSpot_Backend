@@ -18,17 +18,21 @@ public function selectAnimal(array $filter = []): array
     try {
         $pdo = $this->linkDB();
 
-        $query = "SELECT animalid, trivialname, sciencename, lastseen, sightingscount, animalcount FROM animals";
+        $query = "SELECT animalid, trivialname, sciencename, lastseen, sightingscount, animalcount, family FROM animals";
 
         $where = [];
         $params = [];
 
-        /*
+        if (isset($filter['family'])) {
+            $where[] = "family = :family";
+            $params[':family'] = $filter['family'];
+        }
+
         if (isset($filter['minAnimalCount'])) {
             $where[] = "animalcount >= :minAnimalCount"; 
             $params[':minAnimalCount'] = (int)$filter['minAnimalCount'];
         }
-            */
+            
         if (isset($filter['minSightingsCount'])) {
             $where[] = "sightingscount >= :minSightingsCount"; 
             $params[':minSightingsCount'] = (int)$filter['minSightingsCount'];
@@ -39,6 +43,9 @@ public function selectAnimal(array $filter = []): array
         }
 
         $stmt = $pdo->prepare($query);
+
+    
+
         $stmt->execute($params); // Parameter übergeben!
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);

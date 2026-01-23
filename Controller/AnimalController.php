@@ -21,8 +21,8 @@ class AnimalController {
     {
         $model = new AnimalModel() ;
         $filter = [];
-        if(isset($_GET['minAnimalCount'])) {
-            $filter['minAnimalCount'] = (int)$_GET['minAnimalCount'];
+        if(isset($_GET['family'])) {
+            $filter['family'] = $_GET['family'];
         }
         echo json_encode($model->selectAnimal($filter),JSON_PRETTY_PRINT) ; 
     }

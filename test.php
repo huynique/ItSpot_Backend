@@ -32,7 +32,7 @@
  */
 
      $defaults = array(
-         CURLOPT_URL => $url . '/animal/getFilteredAnimal?minAnimalCount=3&minSightingsCount=15',
+         CURLOPT_URL => $url . '/animal/getFilteredAnimal?filter=mammal',
          CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
          CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
          CURLOPT_CUSTOMREQUEST => "GET"
