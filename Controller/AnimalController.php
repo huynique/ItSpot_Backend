@@ -24,6 +24,10 @@ class AnimalController {
         if(isset($_GET['family'])) {
             $filter['family'] = $_GET['family'];
         }
+        if(isset($_GET['animalid'])) {
+            $filter['animalid'] = $_GET['animalid'];
+        }
+
         echo json_encode($model->selectAnimal($filter),JSON_PRETTY_PRINT) ; 
     }
 

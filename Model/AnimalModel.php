@@ -28,6 +28,11 @@ public function selectAnimal(array $filter = []): array
             $params[':family'] = $filter['family'];
         }
 
+        if (isset($filter['animalid'])) {
+            $where[] = "animalid = :animalid";
+            $params[':animalid'] = (int)$filter['animalid'];
+        }
+
         if (isset($filter['minAnimalCount'])) {
             $where[] = "animalcount >= :minAnimalCount"; 
             $params[':minAnimalCount'] = (int)$filter['minAnimalCount'];
