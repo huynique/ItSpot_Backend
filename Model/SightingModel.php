@@ -7,30 +7,76 @@ use ppb\Model\Database;
 
 class SightingModel extends Database 
 {
-    public function __construct()
+    public function __construct() {}
+
+    /**
+     * Fügt ein Sighting ein.
+     * positive/negative/status werden SERVERSEITIG auf 0 gesetzt (unabhängig vom Client).
+     * Gibt die neue sightingsid zurück.
+     */
+    public function insertSighting(array $data): ?int
     {
-        // linkDB kommt aus der Basisklasse
+        try {
+            $pdo = $this->linkDB();
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+            // Pflichtfelder prüfen
+            if (empty($data['animalid'])) {
+                throw new \InvalidArgumentException('animalid ist erforderlich');
+            }
+            if (empty($data['date'])) {
+                // Falls Client kein Datum sendet: heute
+                $data['date'] = date('Y-m-d');
+            }
+            if (!isset($data['ort']) || $data['ort'] === '') {
+                throw new \InvalidArgumentException('ort (Adresse/Ort) ist erforderlich');
+            }
+
+            // Zählwerte
+            $count = isset($data['count']) ? (int)$data['count'] : 0;
+
+            // Koordinaten optional
+            $lat = isset($data['lat']) && $data['lat'] !== '' ? (float)$data['lat'] : null;
+            $lng = isset($data['lng']) && $data['lng'] !== '' ? (float)$data['lng'] : null;
+
+            // Serverseitig erzwingen:
+            $positive = 0;
+            $negative = 0;
+            $status   = 0;
+
+            $sql = "
+                INSERT INTO sightings (animalid, date, ort, positive, negative, status, `count`, lat, lng)
+                VALUES (:animalid, :date, :ort, :positive, :negative, :status, :count, :lat, :lng)
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':animalid' => (int)$data['animalid'],
+                ':date'     => $data['date'],         // 'YYYY-MM-DD'
+                ':ort'      => $data['ort'],
+                ':positive' => $positive,             // erzwungen 0
+                ':negative' => $negative,             // erzwungen 0
+                ':status'   => $status,               // erzwungen 0
+                ':count'    => $count,
+                ':lat'      => $lat,
+                ':lng'      => $lng,
+            ]);
+
+            return (int)$pdo->lastInsertId();
+        } catch (\Throwable $e) {
+            new Msg(true, "Fehler beim Einfügen eines Sightings", $e);
+            return null;
+        }
     }
 
     /**
-     * Lädt Sightings und erlaubt Filter, inkl. family (aus animals).
-     *
-     * Unterstützte Filter:
-     *  - family: string ('mammal', 'bird', ...)
-     *  - animalid: int
-     *  - minAnimalCount: int  (aus animals.animalcount)
-     *  - minSightingsCount: int (aus animals.sightingscount)
-     *  - fromDate: 'YYYY-MM-DD'
-     *  - toDate:   'YYYY-MM-DD'
-     *  - orderBy:  'date'|'lastseen'|... (Whitelist, siehe unten)
-     *  - orderDir: 'ASC'|'DESC'
+     * Bestehende selectSighting() – ergänze lat/lng im SELECT
      */
     public function selectSighting(array $filter = []): array
     {
         try {
             $pdo = $this->linkDB();
 
-            // Basis-SELECT: Sightings + relevante Animal-Felder
             $sql = "
                 SELECT
                     s.sightingsid,
@@ -41,6 +87,8 @@ class SightingModel extends Database
                     s.negative,
                     s.status,
                     s.`count`,
+                    s.lat,                 
+                    s.lng,                 
                     a.trivialname,
                     a.sciencename,
                     a.family,
@@ -54,51 +102,46 @@ class SightingModel extends Database
             $where  = [];
             $params = [];
 
-            // family (aus animals)
             if (isset($filter['family']) && $filter['family'] !== '') {
-                // optional: case-insensitive Vergleich
                 $where[] = "LOWER(a.family) = LOWER(:family)";
                 $params[':family'] = $filter['family'];
             }
-
-            // animalid (primärschlüssel)
             if (isset($filter['animalid']) && $filter['animalid'] !== '') {
                 $where[] = "s.animalid = :animalid";
                 $params[':animalid'] = (int)$filter['animalid'];
             }
-
-            // animals-Counts (liegen in der animals-Tabelle)
             if (isset($filter['minAnimalCount']) && $filter['minAnimalCount'] !== '') {
                 $where[] = "a.animalcount >= :minAnimalCount";
                 $params[':minAnimalCount'] = (int)$filter['minAnimalCount'];
             }
-
             if (isset($filter['minSightingsCount']) && $filter['minSightingsCount'] !== '') {
                 $where[] = "a.sightingscount >= :minSightingsCount";
                 $params[':minSightingsCount'] = (int)$filter['minSightingsCount'];
             }
-
-            // Zeitliche Filter (liegen in sightings.date)
             if (!empty($filter['fromDate'])) {
                 $where[] = "s.date >= :fromDate";
-                $params[':fromDate'] = $filter['fromDate']; // 'YYYY-MM-DD'
+                $params[':fromDate'] = $filter['fromDate'];
             }
-
             if (!empty($filter['toDate'])) {
                 $where[] = "s.date <= :toDate";
                 $params[':toDate'] = $filter['toDate'];
+            }
+
+            // Optional: nur Einträge mit Koordinaten
+            if (isset($filter['hasCoords']) && (int)$filter['hasCoords'] === 1) {
+                $where[] = "s.lat IS NOT NULL AND s.lng IS NOT NULL";
             }
 
             if (!empty($where)) {
                 $sql .= " WHERE " . implode(" AND ", $where);
             }
 
-            // Sortierung (Whitelist gegen SQL-Injection)
             $orderBy  = $filter['orderBy'] ?? 's.date';
             $orderDir = strtoupper($filter['orderDir'] ?? 'DESC');
 
             $allowedOrderBy = [
-                's.date', 's.animalid', 'a.trivialname', 'a.family', 'a.sightingscount', 'a.animalcount'
+                's.date', 's.animalid', 'a.trivialname', 'a.family', 'a.sightingscount', 'a.animalcount',
+                's.lat', 's.lng' // NEU erlaubt
             ];
             if (!in_array($orderBy, $allowedOrderBy, true)) {
                 $orderBy = 's.date';
@@ -108,7 +151,6 @@ class SightingModel extends Database
             }
             $sql .= " ORDER BY {$orderBy} {$orderDir}";
 
-            // Optional: Pagination
             if (isset($filter['limit'])) {
                 $limit = max(1, (int)$filter['limit']);
                 $sql .= " LIMIT {$limit}";

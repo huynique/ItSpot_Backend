@@ -8,48 +8,19 @@ class SightingController {
 
     public function __construct() {}
 
+    /**
+     * GET /sighting?[family=...]&[orderBy=...] ...
+     * (Gute Praxis: alle Query-Params whitelisten & an Model weitergeben)
+     */
     public function getSighting(): void
     {
         $model = new SightingModel();
         $filter = [];
 
-        // Whitelist der erlaubten Parameter
-        $map = [
-            'family'            => 'string',
-            'animalid'          => 'int',
-            'minAnimalCount'    => 'int',
-            'minSightingsCount' => 'int',
-            'fromDate'          => 'string', // 'YYYY-MM-DD'
-            'toDate'            => 'string',
-            'orderBy'           => 'string', // wird im Model auf Whitelist geprüft
-            'orderDir'          => 'string', // ASC/DESC
-            'limit'             => 'int',
-            'offset'            => 'int',
+        $allowed = [
+            'family','animalid','minAnimalCount','minSightingsCount',
+            'fromDate','toDate','orderBy','orderDir','limit','offset','hasCoords'
         ];
-
-        foreach ($map as $key => $type) {
-            if (isset($_GET[$key]) && $_GET[$key] !== '') {
-                $val = $_GET[$key];
-                if ($type === 'int') {
-                    $filter[$key] = (int)$val;
-                } else {
-                    $filter[$key] = $val;
-                }
-            }
-        }
-
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($model->selectSighting($filter), JSON_PRETTY_PRINT);
-    }
-
-    // Optional: kannst du lassen oder ebenfalls erweitern
-    public function getFilteredSighting(): void
-    {
-        $model = new SightingModel();
-        $filter = [];
-
-        // Falls du diese Route weiterhin nutzen willst, hier genauso alle Parameter erlauben:
-        $allowed = ['family','animalid','minAnimalCount','minSightingsCount','fromDate','toDate','orderBy','orderDir','limit','offset'];
         foreach ($allowed as $k) {
             if (isset($_GET[$k]) && $_GET[$k] !== '') {
                 $filter[$k] = $_GET[$k];
@@ -60,12 +31,53 @@ class SightingController {
         echo json_encode($model->selectSighting($filter), JSON_PRETTY_PRINT);
     }
 
-    public function writeSighting($data)
+    /**
+     * POST /sighting
+     * Body: JSON { animalid, date, ort, count, lat?, lng? }
+     * Server setzt positive/negative/status => 0
+     */
+    public function writeSighting(): void
     {
-        $model = new SightingModel();
-        $model->insertSighting($data);
-
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(["success" => true, "msg" => "Animal was posted"]);
+
+        try {
+            // JSON einlesen
+            $raw = file_get_contents('php://input');
+            $payload = json_decode($raw, true);
+            if (!is_array($payload)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'msg' => 'Invalid JSON']);
+                return;
+            }
+
+            // Pflichtfelder minimal prüfen (detaillierte Prüfung macht insertSighting auch)
+            if (empty($payload['animalid']) || empty($payload['date']) || !isset($payload['ort'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'msg' => 'animalid, date und ort sind erforderlich']);
+                return;
+            }
+
+            // Egal was der Client sendet → serverseitig stets 0 setzen:
+            $payload['positive'] = 0;
+            $payload['negative'] = 0;
+            $payload['status']   = 0;
+
+            $model = new SightingModel();
+            $newId = $model->insertSighting($payload);
+
+            if ($newId === null) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'msg' => 'Insert fehlgeschlagen']);
+                return;
+            }
+
+            echo json_encode([
+                'success' => true,
+                'id'      => $newId
+            ]);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'msg' => 'Serverfehler', 'error' => $e->getMessage()]);
+        }
     }
 }
