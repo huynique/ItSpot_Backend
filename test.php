@@ -30,7 +30,7 @@
 /**
  * Options for get tasks filtered
  */
-
+/*
      $defaults = array(
          CURLOPT_URL => $url . '/animal/getFilteredAnimal?filter=mammal',
          CURLOPT_COOKIEFILE => $filepath . 'cookie.txt', // set cookie file to given file
@@ -38,17 +38,18 @@
          CURLOPT_CUSTOMREQUEST => "GET"
     );
     
-    
+    */
 /**
  * Options for insert new animal
  */
-/*
+
      $params = json_encode(array("animalid" => '187'
          , 'trivialname' => 'Oxolotl'
          , 'sciencename' => 'Pinecest'
          , 'lastseen' => '13.04.2004'
          , 'sightingscount' => '90'
-         , 'animalcount' => '90'));
+         , 'animalcount' => '90'
+         , 'family' => 'fish'));
      $defaults = array(
          CURLOPT_URL => $url . '/animal',
          CURLOPT_CUSTOMREQUEST => "POST",
@@ -56,7 +57,7 @@
          CURLOPT_COOKIEJAR => $filepath . 'cookie.txt', // set same file as cookie jar
          CURLOPT_POSTFIELDS => $params
      );
-     */
+     
 
 /**
  * Options for Update Task OHNE Login

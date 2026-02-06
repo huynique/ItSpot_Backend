@@ -68,8 +68,8 @@ public function selectAnimal(array $filter = []): array
         $pdo = $this->linkDB();
 
         $stmt = $pdo->prepare("
-            INSERT INTO animals (animalid, trivialname, sciencename, lastseen, sightingscount, animalcount)
-            VALUES (:animalid, :trivialname, :sciencename, :lastseen, :sightingscount, :animalcount)
+            INSERT INTO animals (animalid, trivialname, sciencename, lastseen, sightingscount, animalcount, family)
+            VALUES (:animalid, :trivialname, :sciencename, :lastseen, :sightingscount, :animalcount , :family)
         ");
 
         // UUID erzeugen (du hast ja createUUID() in Database)
@@ -83,6 +83,7 @@ public function selectAnimal(array $filter = []): array
             ':lastseen' => $dt ? $dt->format('Y-m-d') : null,
             ':sightingscount' => $data['sightingscount'],
             ':animalcount' => $data['animalcount'],
+            ':family' => $data['family'],
         ]); 
 
     } catch (\PDOException $e) {

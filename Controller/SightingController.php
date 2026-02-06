@@ -50,14 +50,14 @@ class SightingController {
                 return;
             }
 
-            // Pflichtfelder minimal prüfen (detaillierte Prüfung macht insertSighting auch)
+            // flichtfelder minimal prüfen (detaillierte Prüfung macht insertSighting auch)
             if (empty($payload['animalid']) || empty($payload['date']) || !isset($payload['ort'])) {
                 http_response_code(400);
                 echo json_encode(['success' => false, 'msg' => 'animalid, date und ort sind erforderlich']);
                 return;
             }
 
-            // Egal was der Client sendet → serverseitig stets 0 setzen:
+            // egal was der Client sendet → serverseitig 0 setzen:
             $payload['positive'] = 0;
             $payload['negative'] = 0;
             $payload['status']   = 0;

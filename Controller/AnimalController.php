@@ -21,9 +21,13 @@ class AnimalController {
     {
         $model = new AnimalModel() ;
         $filter = [];
+
+        // für family filter
         if(isset($_GET['family'])) {
             $filter['family'] = $_GET['family'];
         }
+
+        // um bestimmte animals rauszusuchen
         if(isset($_GET['animalid'])) {
             $filter['animalid'] = $_GET['animalid'];
         }
